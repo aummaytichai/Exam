@@ -1,5 +1,34 @@
+# dependencies
 node_modules/
+.pnp
+.pnp.js
+
+# next.js
 .next/
+out/
+
+# environment files — ALL variants must be excluded
 .env
+.env.local
+.env.*.local
+.env.production
+.env.development.local
+.env.test.local
+
+# logs
 *.log
+npm-debug.log*
+
+# build outputs
 dist/
+build/
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# misc
+.DS_Store
+Thumbs.db
+coverage/
+.turbo/
