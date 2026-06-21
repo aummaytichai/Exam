@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Restaurant {
+  id        String      @id @default(cuid())
+  name      String
+  category  String
+  lat       Float
+  lon       Float
+  orders    Order[]
+  menuItems MenuItem[]
+  createdAt DateTime    @default(now())
+}
+
+model MenuItem {
+  id           String      @id @default(cuid())
+  restaurantId String
+  restaurant   Restaurant  @relation(fields: [restaurantId], references: [id])
+  name         String
+  price        Float
+  stock        Int
+  orderItems   OrderItem[]
+}
+
+model Order {
+  id           String      @id @default(cuid())
+  restaurantId String
+  restaurant   Restaurant  @relation(fields: [restaurantId], references: [id])
+  status       String
+  totalAmount  Float
+  createdAt    DateTime    @default(now())
+  items        OrderItem[]
+}
+
+model OrderItem {
+  id         String   @id @default(cuid())
+  orderId    String
+  order      Order    @relation(fields: [orderId], references: [id])
+  menuItemId String
+  menuItem   MenuItem @relation(fields: [menuItemId], references: [id])
+  qty        Int
+  price      Float
+}
+
+model Rider {
+  id            String            @id @default(cuid())
+  name          String
+  lat           Float
+  lon           Float
+  rating        Float
+  status        String            @default("active")
+  lastUpdatedAt DateTime          @default(now())
+  cancellations CancellationLog[]
+}
+
+model ZoneIncentive {
+  id              String   @id @default(cuid())
+  zoneId          String
+  bonusMultiplier Float
+  triggerReason   String?
+  startedAt       DateTime @default(now())
+  expiresAt       DateTime
+  createdBy       String   @default("system")
+}
+
+model CancellationLog {
+  id                      String   @id @default(cuid())
+  riderId                 String
+  rider                   Rider    @relation(fields: [riderId], references: [id])
+  orderId                 String
+  cancelledAt             DateTime @default(now())
+  cancelReason            String?
+  distanceToRestaurantKm  Float?
+  hadActiveIncentive      Boolean  @default(false)
+  incentiveMultiplier     Float?
+  timeSinceAcceptedSec    Int?
+  consecutiveCancelsToday Int      @default(0)
+  zoneId                  String?
+  fraudScore              Float    @default(0)
+  flaggedForReview        Boolean  @default(false)
+}
